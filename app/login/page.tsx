@@ -1,26 +1,41 @@
 "use client";
 
-import { useState } from "react";
+// import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+
+import { authClient } from "@/lib/auth-client";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { toast } from "sonner";
 
 export default function LoginPage() {
-	const [isSubmitting, setIsSubmitting] = useState(false);
+	// const router = useRouter();
 
 	async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
 		e.preventDefault();
-		setIsSubmitting(true);
 
-		try {
-			toast.success("Signed in");
-		} catch (err) {
-			toast.error("Login failed");
-		} finally {
-			setIsSubmitting(false);
+		const formData = new FormData(e.currentTarget);
+		const email = formData.get("email");
+		const password = formData.get("password");
+
+		if (typeof email !== "string" || typeof password !== "string") {
+			toast.error("Invalid form data");
+			return;
 		}
+
+		const { data, error } = await authClient.signIn.email({
+			email,
+			password,
+		});
+
+		if (error) {
+			toast.error(error.message ?? "Login Failed");
+			return;
+		}
+
+		toast.success(`Signed In as ${data.user.name}`);
 	}
 
 	return (
@@ -37,7 +52,6 @@ export default function LoginPage() {
 								id="email"
 								name="email"
 								type="email"
-								autoComplete="email"
 								required
 							/>
 						</div>
@@ -48,17 +62,12 @@ export default function LoginPage() {
 								id="password"
 								name="password"
 								type="password"
-								autoComplete="current-password"
 								required
 							/>
 						</div>
 
-						<Button
-							type="submit"
-							className="w-full"
-							disabled={isSubmitting}
-						>
-							{isSubmitting ? "Signing in..." : "Sign in"}
+						<Button type="submit" className="w-full">
+							Sign in
 						</Button>
 					</form>
 				</CardContent>
