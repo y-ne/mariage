@@ -2,6 +2,10 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
+import { AppSidebar } from "@/components/app-sidebar";
+import { SiteHeader } from "@/components/site-header";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+
 export default async function AdminLayout({
 	children,
 }: {
@@ -12,5 +16,19 @@ export default async function AdminLayout({
 	if (!session) redirect("/login");
 	if (session.user.role !== "admin") redirect("/dashboard");
 
-	return children;
+	return (
+		<div className="[--header-height:calc(--spacing(14))]">
+			<SidebarProvider className="flex flex-col">
+				<SiteHeader />
+				<div className="flex flex-1">
+					<AppSidebar />
+					<SidebarInset>
+						<div className="flex flex-1 flex-col gap-4 p-4">
+							{children}
+						</div>
+					</SidebarInset>
+				</div>
+			</SidebarProvider>
+		</div>
+	);
 }

@@ -12,3 +12,8 @@ pnpm drizzle-kit generate
 # Drizzle Migrate
 pnpm drizzle-kit migrate
 ```
+
+```bash
+# adding component with shadcn
+pnpm dlx shadcn@latest add
+```
