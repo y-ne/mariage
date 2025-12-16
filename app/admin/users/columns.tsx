@@ -1,11 +1,6 @@
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-
 import { EditUserDialog } from "./edit-user-dialog";
 
 export type UserRow = {
@@ -23,46 +18,7 @@ function roleText(r: UserRow["role"]) {
 }
 
 export const columns: ColumnDef<UserRow>[] = [
-	{
-		id: "select",
-		header: ({ table }) => (
-			<Checkbox
-				checked={
-					table.getIsAllPageRowsSelected() ||
-					(table.getIsSomePageRowsSelected() && "indeterminate")
-				}
-				onCheckedChange={(value) =>
-					table.toggleAllPageRowsSelected(!!value)
-				}
-				aria-label="Select all"
-			/>
-		),
-		cell: ({ row }) => (
-			<Checkbox
-				checked={row.getIsSelected()}
-				onCheckedChange={(value) => row.toggleSelected(!!value)}
-				aria-label="Select row"
-			/>
-		),
-		enableSorting: false,
-		enableHiding: false,
-	},
-	{
-		accessorKey: "email",
-		header: ({ column }) => (
-			<Button
-				variant="ghost"
-				onClick={() =>
-					column.toggleSorting(column.getIsSorted() === "asc")
-				}
-			>
-				Email <ArrowUpDown className="ml-2 h-4 w-4" />
-			</Button>
-		),
-		cell: ({ row }) => (
-			<div className="lowercase">{row.getValue("email")}</div>
-		),
-	},
+	{ accessorKey: "email", header: "Email" },
 	{ accessorKey: "name", header: "Name" },
 	{ accessorKey: "username", header: "Username" },
 	{
@@ -82,7 +38,7 @@ export const columns: ColumnDef<UserRow>[] = [
 	},
 	{
 		id: "actions",
-		enableHiding: false,
+		header: "",
 		cell: ({ row }) => <EditUserDialog user={row.original} />,
 	},
 ];

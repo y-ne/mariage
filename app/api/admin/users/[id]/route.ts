@@ -2,10 +2,9 @@ import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 
-type SessionLike = { user?: { role?: string | string[] | null } } | null;
-
-function isAdmin(session: SessionLike) {
-	const r = session?.user?.role;
+function isAdmin(session: unknown) {
+	const s = session as { user?: { role?: string | string[] | null } } | null;
+	const r = s?.user?.role;
 	const roles = Array.isArray(r) ? r : r ? [r] : [];
 	return roles.includes("admin");
 }
@@ -17,18 +16,17 @@ export async function PATCH(
 	const { id } = await params;
 	const h = await headers();
 
-	const session = (await auth.api.getSession({ headers: h })) as SessionLike;
-	if (!session || !isAdmin(session)) {
+	const session = await auth.api.getSession({ headers: h });
+	if (!isAdmin(session)) {
 		return NextResponse.json({ message: "Forbidden" }, { status: 403 });
 	}
 
-	const body = (await req.json().catch(() => ({}))) as {
-		name?: unknown;
-		username?: unknown;
-		role?: unknown;
-	};
+	const body = (await req.json().catch(() => ({}))) as Record<
+		string,
+		unknown
+	>;
 
-	const data: Record<string, unknown> = {};
+	const data: Record<string, string> = {};
 	if (typeof body.name === "string") data.name = body.name;
 	if (typeof body.username === "string") data.username = body.username;
 
