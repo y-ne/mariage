@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SidebarIcon } from "lucide-react";
 
@@ -55,28 +54,24 @@ export function SiteHeader() {
 				<Breadcrumb className="hidden sm:block">
 					<BreadcrumbList>
 						<BreadcrumbItem>
-							<BreadcrumbLink asChild>
-								<Link href={isAdmin ? "/admin" : "/"}>
-									{isAdmin ? "Admin" : "Home"}
-								</Link>
-							</BreadcrumbLink>
+							<BreadcrumbLink href="/admin">Admin</BreadcrumbLink>
 						</BreadcrumbItem>
 
-						{crumbs.length > 0 && <BreadcrumbSeparator />}
-
 						{crumbs.map((c) => (
-							<BreadcrumbItem key={c.href}>
-								{c.isLast ? (
-									<BreadcrumbPage>{c.label}</BreadcrumbPage>
-								) : (
-									<>
-										<BreadcrumbLink asChild>
-											<Link href={c.href}>{c.label}</Link>
+							<span key={c.href} className="contents">
+								<BreadcrumbSeparator />
+								<BreadcrumbItem>
+									{c.isLast ? (
+										<BreadcrumbPage>
+											{c.label}
+										</BreadcrumbPage>
+									) : (
+										<BreadcrumbLink href={c.href}>
+											{c.label}
 										</BreadcrumbLink>
-										<BreadcrumbSeparator />
-									</>
-								)}
-							</BreadcrumbItem>
+									)}
+								</BreadcrumbItem>
+							</span>
 						))}
 					</BreadcrumbList>
 				</Breadcrumb>

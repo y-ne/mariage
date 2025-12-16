@@ -27,11 +27,15 @@ const data = {
 			title: "Users",
 			url: "/admin/users",
 			icon: SquareTerminal,
-			isActive: true,
+			isActive: false,
 			items: [
 				{
 					title: "All Users",
 					url: "/admin/users",
+				},
+				{
+					title: "Create Users",
+					url: "/admin/users/create",
 				},
 			],
 		},
