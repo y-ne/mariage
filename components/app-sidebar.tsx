@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Command, LifeBuoy, Send, SquareTerminal } from "lucide-react";
+import { Command, LifeBuoy, Send, Users } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
 import { NavSecondary } from "@/components/nav-secondary";
@@ -26,7 +26,7 @@ const data = {
 		{
 			title: "Users",
 			url: "/admin/users",
-			icon: SquareTerminal,
+			icon: Users,
 			isActive: false,
 			items: [
 				{

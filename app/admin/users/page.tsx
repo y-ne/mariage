@@ -1,19 +1,28 @@
-import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import { auth } from "@/lib/auth";
+import { DataTable } from "./data-table";
+import type { UserRow } from "./columns";
 
-import {
-	Table,
-	TableBody,
-	TableCell,
-	TableHead,
-	TableHeader,
-	TableRow,
-} from "@/components/ui/table";
+type R = Record<string, unknown>;
 
-function cell(value: unknown) {
-	if (value === null || value === undefined || value === "") return "-";
-	if (typeof value === "boolean") return value ? "true" : "false";
-	return String(value);
+function str(v: unknown) {
+	return typeof v === "string" ? v : "";
+}
+
+function bool(v: unknown) {
+	return typeof v === "boolean" ? v : false;
+}
+
+function role(v: unknown): string | string[] {
+	if (typeof v === "string") return v;
+	if (Array.isArray(v) && v.every((x) => typeof x === "string")) return v;
+	return "user";
+}
+
+function iso(v: unknown) {
+	if (typeof v === "string") return v;
+	if (v instanceof Date) return v.toISOString();
+	return "";
 }
 
 export default async function AllUsersPage() {
@@ -22,98 +31,22 @@ export default async function AllUsersPage() {
 		headers: await headers(),
 	});
 
-	const users = res.users ?? [];
+	const data: UserRow[] = (res.users ?? []).map((u) => {
+		const x = u as unknown as R;
+		return {
+			id: str(x.id),
+			name: str(x.name),
+			email: str(x.email),
+			username: str(x.username),
+			role: role(x.role),
+			banned: bool(x.banned),
+			createdAt: iso(x.createdAt ?? x.created_at),
+		};
+	});
 
 	return (
-		<div className="space-y-4">
-			<div className="rounded-md border overflow-x-auto">
-				<Table>
-					<TableHeader>
-						<TableRow className="whitespace-nowrap">
-							<TableHead>id</TableHead>
-							<TableHead>name</TableHead>
-							<TableHead>email</TableHead>
-							<TableHead>email_verified</TableHead>
-							<TableHead>image</TableHead>
-							<TableHead>created_at</TableHead>
-							<TableHead>updated_at</TableHead>
-							<TableHead>username</TableHead>
-							<TableHead>display_username</TableHead>
-							<TableHead>role</TableHead>
-							<TableHead>banned</TableHead>
-							<TableHead>ban_reason</TableHead>
-							<TableHead>ban_expires</TableHead>
-						</TableRow>
-					</TableHeader>
-
-					<TableBody>
-						{users.length === 0 ? (
-							<TableRow>
-								<TableCell
-									colSpan={13}
-									className="py-6 text-center text-sm text-muted-foreground"
-								>
-									No users
-								</TableCell>
-							</TableRow>
-						) : (
-							users.map((user) => (
-								<TableRow
-									key={cell(Reflect.get(user, "id"))}
-									className="whitespace-nowrap"
-								>
-									<TableCell>
-										{cell(Reflect.get(user, "id"))}
-									</TableCell>
-									<TableCell>
-										{cell(Reflect.get(user, "name"))}
-									</TableCell>
-									<TableCell>
-										{cell(Reflect.get(user, "email"))}
-									</TableCell>
-									<TableCell>
-										{cell(
-											Reflect.get(user, "email_verified"),
-										)}
-									</TableCell>
-									<TableCell>
-										{cell(Reflect.get(user, "image"))}
-									</TableCell>
-									<TableCell>
-										{cell(Reflect.get(user, "created_at"))}
-									</TableCell>
-									<TableCell>
-										{cell(Reflect.get(user, "updated_at"))}
-									</TableCell>
-									<TableCell>
-										{cell(Reflect.get(user, "username"))}
-									</TableCell>
-									<TableCell>
-										{cell(
-											Reflect.get(
-												user,
-												"display_username",
-											),
-										)}
-									</TableCell>
-									<TableCell>
-										{cell(Reflect.get(user, "role"))}
-									</TableCell>
-									<TableCell>
-										{cell(Reflect.get(user, "banned"))}
-									</TableCell>
-									<TableCell>
-										{cell(Reflect.get(user, "ban_reason"))}
-									</TableCell>
-									<TableCell>
-										{cell(Reflect.get(user, "ban_expires"))}
-									</TableCell>
-								</TableRow>
-							))
-						)}
-					</TableBody>
-				</Table>
-			</div>
+		<div className="w-full space-y-4 p-6">
+			<DataTable data={data} />
 		</div>
 	);
 }
